@@ -6,8 +6,9 @@ use Cwd  qw(abs_path);
 use lib dirname(dirname abs_path $0) . '/server';
 use 5.010;
 use DataManager;
+use Data::Dumper;
 
 my $parser = DataManager->new;
 foreach my $row ($parser->get_data('aapl')) {
-    say $row;
+    say Dumper($row)
 }

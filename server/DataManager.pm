@@ -1,9 +1,10 @@
 package DataManager;
 use strict;
 use warnings;
+use 5.010;
 use LWP::Simple;
 use HTML::TreeBuilder;
-use 5.010;
+use Record;
 
 sub new {
     my $class = shift;
@@ -23,7 +24,13 @@ sub get_data {
     $tree->parse($result);
     $tree->eof;
 
-    return map { $_->as_text } $tree->look_down('_tag', 'tbody')->look_down('_tag', 'tr');
+    my @rows = map { $_->as_text } $tree->look_down('_tag', 'tbody')->look_down('_tag', 'tr');
+    my @records = map {
+        my @data = split ' ', $_;
+        Record->new($data[0], $data[1], $data[2], $data[3], $data[4], $data[5])
+    } @rows;
+
+    return @records;
 }
 
 1;
