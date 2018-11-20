@@ -15,8 +15,11 @@ sub get_data {
     my $this = shift;
     my $symbol = shift;
     die "No Symbol provided" unless defined $symbol;
+	
+	print "$symbol \n";
 
-    my $url = 'https://www.nasdaq.com/symbol/' . $symbol . '/historical';
+    my $url = "https://www.nasdaq.com/symbol/$symbol/historical";
+	print "$url \n";
     my $result = get($url);
     die "Failed to get page!" unless defined $result;
 
