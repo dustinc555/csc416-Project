@@ -15,8 +15,9 @@ sub get_data {
     my $this = shift;
     my $symbol = shift;
     die "No Symbol provided" unless defined $symbol;
-
+    
     my $url = 'https://www.nasdaq.com/symbol/' . $symbol . '/historical';
+    
     my $result = get($url);
     die "Failed to get page!" unless defined $result;
 
@@ -32,5 +33,6 @@ sub get_data {
 
     return @records;
 }
+
 
 1;

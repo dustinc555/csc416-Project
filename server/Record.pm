@@ -2,6 +2,7 @@ package Record;
 use strict;
 use warnings;
 
+
 sub new {
     my $class = shift;
 
@@ -13,7 +14,7 @@ sub new {
         'close' => shift,
         'volume' => shift,
     };
-
+    
     return bless $object, $class;
 }
 
@@ -45,6 +46,11 @@ sub close {
 sub volume {
     my $this = shift;
     return $this->{volume}
+}
+
+sub to_string {
+    my $this = shift;
+    return sprintf '%s %s %s %s %s %s', $this->date, $this->open, $this->high, $this->low, $this->close, $this->volume;
 }
 
 1;
