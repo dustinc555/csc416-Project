@@ -9,33 +9,123 @@ use strict;
 use warnings;
 
 use DataManager;
+use Record;
 
-sub update {
-        #symbol should be the first param
-        my $self = shift; # this is how you get all args and assign them to vars at the same time
-        my $symbol = shift;
-
-        # have DataManager handle getting and parsing the data
-        my $parser = DataManager->new;
-        foreach my $row ($parser->get_data($symbol)) {
-                say $row; # do stuff with row of stock data
-        }
-}
+my %fieldToIndex = ('date' => 0,
+                    'open' => 1,
+                    'high' => 2,
+                    'low' => 3,
+                    'close' => 4,
+                    'volume' => 5);
 
 sub new {
 	# looks funky but this is how perl does classes
 	my $class = shift;
-	my $self = ( update => \&update );
+	my $self = { update => \&update,
+                max => \&max,
+                min => \&min,
+                get => \&get};
 	return bless $self, $class;
 }
 
-sub dispatch {
-	my $self = shift;
-	my $query = shift;
-	my @args = split ' ', $query;
-	my $routine = $args[0];
-	my $symbol = $args[1];
-	$self->$routine($symbol); # look for it in our list of actions
+sub update {
+    #symbol should be the first param
+    my $self = shift; # this is how you get all args and assign them to vars at the same time
+    my $symbol = shift;
+    
+    
+    # have DataManager handle getting and parsing the data
+    my $parser = DataManager->new;
+    my @records = $parser->get_data($symbol);
+    open(my $fh, '>', "$symbol.txt");
+    foreach my $row (@records) {
+            say $fh $row->to_string;
+    }
+    
+    return "Successfully Updated $symbol";
+}
+
+sub max {
+    my $self = shift; # this is how you get all args and assign them to vars at the same time
+    my @args = split ' ', shift;
+    
+    my $symbol = $args[0];
+    my $field = $args[1];
+    my $index = $fieldToIndex{$field};
+    my $filename = "$symbol.txt";
+    
+    #print("symbol: $symbol, field: $field, index: $index");
+    
+    open(my $fh, '<:encoding(UTF-8)', $filename)
+    or die "Could not open file '$filename' $!";
+    
+    
+    my $firstLine = <$fh>;
+    my @line = split ' ', $firstLine;
+    my $val = $line[$index];
+    my $stock = $firstLine;
+    while (my $row = <$fh>) {
+        my @arr = split ' ', $row;
+        if ($val < $arr[$index]) {
+            $val = $arr[$index];
+            $stock = $row;
+        }
+    }
+    
+    return $stock;
+}
+
+sub min {
+    my $self = shift; # this is how you get all args and assign them to vars at the same time
+    my @args = split ' ', shift;
+    
+    my $symbol = $args[0];
+    my $field = $args[1];
+    my $index = $fieldToIndex{$field};
+    my $filename = "$symbol.txt";
+    
+    #print("symbol: $symbol, field: $field, index: $index");
+    
+    open(my $fh, '<:encoding(UTF-8)', $filename)
+    or die "Could not open file '$filename' $!";
+    
+    
+    my $firstLine = <$fh>;
+    my @line = split ' ', $firstLine;
+    my $val = $line[$index];
+    my $stock = $firstLine;
+    while (my $row = <$fh>) {
+        my @arr = split ' ', $row;
+        if ($val > $arr[$index]) {
+            $val = $arr[$index];
+            $stock = $row;
+        }
+    }
+    
+    return $stock;
+}
+
+sub get {
+    my $self = shift; # this is how you get all args and assign them to vars at the same time
+    my @args = split ' ', shift;
+    my $symbol = $args[0];
+    my $date = $args[1];
+    
+    my $filename = "$symbol.txt";
+    my $field = $fieldToIndex{ 'date' };
+    
+    open(my $fh, '<:encoding(UTF-8)', $filename)
+    or die "Could not open file '$filename' $!";
+    
+    while (my $row = <$fh>) {
+        my @arr = split ' ', $row;
+        # $this->date, $this->open, $this->high, $this->low, $this->close, $this->volume
+        if ($arr[$field] eq $date) {
+            return $row;
+        }
+    }
+    
+    return "date not found";
 }
 
 1;
