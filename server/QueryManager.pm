@@ -21,10 +21,10 @@ my %fieldToIndex = ('date' => 0,
 sub new {
 	# looks funky but this is how perl does classes
 	my $class = shift;
-	my $self = ( update => \&update,
+	my $self = { update => \&update,
                 max => \&max,
                 min => \&min,
-                get => \&get);
+                get => \&get};
 	return bless $self, $class;
 }
 
@@ -96,7 +96,7 @@ sub min {
     my $stock = $firstLine;
     while (my $row = <$fh>) {
         my @arr = split ' ', $row;
-        if ($val < $arr[$index]) {
+        if ($val > $arr[$index]) {
             $val = $arr[$index];
             $stock = $row;
         }

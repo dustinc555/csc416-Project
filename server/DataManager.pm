@@ -27,6 +27,7 @@ sub get_data {
 
     my @rows = map { $_->as_text } $tree->look_down('_tag', 'tbody')->look_down('_tag', 'tr');
     my @records = map {
+        $_ =~ s/,//g;           ### Strip Commas 
         my @data = split ' ', $_;
         Record->new($data[0], $data[1], $data[2], $data[3], $data[4], $data[5])
     } @rows;
