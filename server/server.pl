@@ -10,7 +10,7 @@ use Cwd  qw(abs_path);
 use lib dirname(dirname abs_path $0) . '/server';
 use String::Util 'trim';
 use 5.010;
-
+use Term::ANSIColor;
 use QueryManager;
 use IO::Socket::INET;
 
@@ -37,13 +37,17 @@ while(1)
     # get information about a nyewly connected client
     my $client_address = $client_socket->peerhost();
     my $client_port = $client_socket->peerport();
+    print color('bold green');
     print "connection from $client_address:$client_port\n";
+    print color('reset');
 
     # read up to 1024 characters from the connected client
     my $query = "";
     $client_socket->recv($query, 1024);
+    print color('bold red');
     print "received query: $query\n";
-    
+    print color('reset');    
+
     # process the request
     my $response = "Undefined Command";
     
@@ -55,7 +59,7 @@ while(1)
     chomp $query;
     chomp $action;
     
-    if ($qm->can($action)) {     # if its a valid method
+    if ($qm->can($action)) {                # if its a valid method
         $response = $qm->$action($query);   # call it
     }
  

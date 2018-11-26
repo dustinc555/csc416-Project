@@ -2,6 +2,7 @@
 
 use IO::Socket::INET;
 use String::Util qw(trim);
+use Term::ANSIColor;
 
 my $commands = "Query List,
 update <stock name>
@@ -36,9 +37,10 @@ while (1)
     # receive a response of up to 1024 characters from server
     my $response = "";
     $socket->recv($response, 1024);
-    
+
+    print color('bold blue');    
     print "$server_address:$server_port | $response\n\n";
-    
+    print color('reset'); 
 }
  
 $socket->close();
