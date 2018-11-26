@@ -7,7 +7,7 @@ use 5.010;
 
 use strict;
 use warnings;
-
+ 
 use DataManager;
 use Record;
 
@@ -32,14 +32,21 @@ sub update {
     #symbol should be the first param
     my $self = shift; # this is how you get all args and assign them to vars at the same time
     my $symbol = shift;
-    
-    
-    # have DataManager handle getting and parsing the data
-    my $parser = DataManager->new;
-    my @records = $parser->get_data($symbol);
-    open(my $fh, '>', "$symbol.txt");
-    foreach my $row (@records) {
-            say $fh $row->to_string;
+   
+    my @stockList = ("aapl", "amzn", "msft"); 
+    my %stockHash = map { $_ => 1 } @stockList;       # easiest way to find if item is in list is to convert to hash
+   
+
+    if ($symbol eq "all") {
+        foreach my $s (@stockList) {
+            $self->__updateStock($s);
+            sleep 3;
+        }
+    } elsif (exists($stockHash{$symbol})) {
+        $self->__updateStock($symbol);
+    } else {
+      # the array does not yet contain this ip address; add it
+      return "Stock not in list";
     }
     
     return "Successfully Updated $symbol";
@@ -126,6 +133,18 @@ sub get {
     }
     
     return "date not found";
+}
+
+sub __updateStock {
+    my $self = shift;
+    my $symbol = shift;
+    # have DataManager handle getting and parsing the data
+    my $parser = DataManager->new;
+    my @records = $parser->get_data($symbol);
+    open(my $fh, '>', "$symbol.txt");
+    foreach my $row (@records) {
+        say $fh $row->to_string;
+    }
 }
 
 1;
