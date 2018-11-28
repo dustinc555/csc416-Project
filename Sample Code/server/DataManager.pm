@@ -6,11 +6,19 @@ use LWP::Simple;
 use HTML::TreeBuilder;
 use Record;
 
+=for Class Constructor
+    basic constructor bless is what binds the hash to the class (mem address)
+=cut
 sub new {
     my $class = shift;
     return bless {}, $class;
 }
 
+=for get_data(String symbol)
+    * Param symbol: makes request to nasdaq for the symbol
+    parses the received html into Record objects 
+    * Return:  
+=cut
 sub get_data {
     my $this = shift;
     my $symbol = shift;

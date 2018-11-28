@@ -11,6 +11,9 @@ use warnings;
 use DataManager;
 use Record;
 
+=for fieldToIndex
+    maps an array address to a stock field
+=cut
 my %fieldToIndex = ('date' => 0,
                     'open' => 1,
                     'high' => 2,
@@ -18,6 +21,10 @@ my %fieldToIndex = ('date' => 0,
                     'close' => 4,
                     'volume' => 5);
 
+=for constructor
+    basic constructor
+    class is used as dispatch table for server
+=cut
 sub new {
 	# looks funky but this is how perl does classes
 	my $class = shift;
@@ -28,6 +35,12 @@ sub new {
 	return bless $self, $class;
 }
 
+=for update(String symbol) : String
+    * checks if the symbol is in our list of approved stocks
+    if so uses DataManager to make a get request to site and parse information
+    * Param symbol: the stock symbol to get
+    * Return: a string describing if the operation was a success
+=cut
 sub update {
     #symbol should be the first param
     my $self = shift; # this is how you get all args and assign them to vars at the same time
@@ -52,8 +65,14 @@ sub update {
     return "Successfully Updated $symbol";
 }
 
+=for max(String symbol, String field) : String
+    * returns the max field for the symbol
+    * Param symbol: the stock symbol
+    * Param field: the field for the stock object (open, high, low, close, volume)
+    * Return: either a string representing the stock or an error message
+=cut
 sub max {
-    my $self = shift; # this is how you get all args and assign them to vars at the same time
+    my $self = shift;
     my @args = split ' ', shift;
     
     my $symbol = $args[0];
@@ -61,11 +80,8 @@ sub max {
     my $index = $fieldToIndex{$field};
     my $filename = "$symbol.txt";
     
-    #print("symbol: $symbol, field: $field, index: $index");
-    
     open(my $fh, '<:encoding(UTF-8)', $filename)
     or die "Could not open file '$filename' $!";
-    
     
     my $firstLine = <$fh>;
     my @line = split ' ', $firstLine;
@@ -78,10 +94,15 @@ sub max {
             $stock = $row;
         }
     }
-    
     return $stock;
 }
 
+=for min(String symbol, String field) : String
+    * returns the min field for the symbol
+    * Param symbol: the stock symbol
+    * Param field: the field for the stock object (open, high, low, close, volume)
+    * Return: either a string representing the stock or an error message
+=cut
 sub min {
     my $self = shift; # this is how you get all args and assign them to vars at the same time
     my @args = split ' ', shift;
@@ -91,11 +112,8 @@ sub min {
     my $index = $fieldToIndex{$field};
     my $filename = "$symbol.txt";
     
-    #print("symbol: $symbol, field: $field, index: $index");
-    
     open(my $fh, '<:encoding(UTF-8)', $filename)
     or die "Could not open file '$filename' $!";
-    
     
     my $firstLine = <$fh>;
     my @line = split ' ', $firstLine;
@@ -108,10 +126,15 @@ sub min {
             $stock = $row;
         }
     }
-    
     return $stock;
 }
 
+=for get(String symbol, String date) : String
+    * looks for stock information with corresponding date
+    * Param symbol: the stock symbol
+    * Param date: MM/DD/YYYY e.g. 11/28/2018
+    * Return: a string representing the stock or an error message
+=cut
 sub get {
     my $self = shift; # this is how you get all args and assign them to vars at the same time
     my @args = split ' ', shift;
@@ -135,6 +158,13 @@ sub get {
     return "date not found";
 }
 
+
+=for __updateStock(String symbol) : Void
+    * private function uses DataManager to fetch and parse stock information
+    if successful stores to file
+    * Param symbol: the stock symbol
+    * Return: nothing but can die and send up die message to be caught
+=cut
 sub __updateStock {
     my $self = shift;
     my $symbol = shift;

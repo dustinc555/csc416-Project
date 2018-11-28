@@ -4,6 +4,7 @@ use IO::Socket::INET;
 use String::Util qw(trim);
 use Term::ANSIColor;
 
+# user prompt that lists valid commands
 my $commands = "Query List,
 update <stock name>
 max <stock name> <field>
@@ -12,6 +13,11 @@ get <stock name> <month/day/year>
 <field> : 'open' 'high' 'low' 'close' 'volume'
 Choice: ";
  
+=for program main loop
+check if server is up, if so
+prompt user for input and send
+string to server
+=cut
 while (1)
 {
     my $socket = new IO::Socket::INET(

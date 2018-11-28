@@ -2,6 +2,7 @@
 
 package SimpleServer;
 
+use 5.010;
 use strict; 
 use warnings;
 
@@ -9,10 +10,9 @@ use File::Basename qw(dirname);
 use Cwd  qw(abs_path);
 use lib dirname(dirname abs_path $0) . '/server';
 use String::Util 'trim';
-use 5.010;
 use Term::ANSIColor;
-use QueryManager;
 use IO::Socket::INET;
+use QueryManager;
 
 # auto-flush on socket
 $| = 1;
@@ -30,9 +30,11 @@ my $socket = new IO::Socket::INET (
 die "cannot create socket $!\n" unless $socket;
 print "server waiting for client connection on port 50000\n";
 
-
+# program main loop
+# accept any given request from client
 while(1)
 {
+    # waits for client
     my $client_socket = $socket->accept();
     # get information about a nyewly connected client
     my $client_address = $client_socket->peerhost();
@@ -54,15 +56,16 @@ while(1)
     $query =~ /(\w+).*/;
     my $action = $1;                  # store first word from query (the command)
     $query =~ s/^\S+\s*//;            # now remove first word from query 
-    $action = trim($action);              # trim newlines and whitespace
-    $query = trim($query);
-    chomp $query;
+    $action = trim($action);          # get rid of newlines and whitespace
+    $query = trim($query);            # trim: gets rid of trailing whitespace
+    chomp $query;                     # chomp: gets rid of trailing newlines
     chomp $action;
-    
+   
+    # can: checks to see if a class has this subroutine 
     if ($qm->can($action)) { 
-        eval {               # if its a valid method
+        eval {                             # if its a valid method
         $response = $qm->$action($query)   # call it 
-        }; $response = $@ if $@;
+        }; $response = $@ if $@;           # if something went wrong (die), this catches the error message
     }
  
     # write response data to the connected client
