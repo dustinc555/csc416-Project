@@ -59,8 +59,10 @@ while(1)
     chomp $query;
     chomp $action;
     
-    if ($qm->can($action)) {                # if its a valid method
-        $response = $qm->$action($query);   # call it
+    if ($qm->can($action)) { 
+        eval {               # if its a valid method
+        $response = $qm->$action($query)   # call it 
+        }; $response = $@ if $@;
     }
  
     # write response data to the connected client
