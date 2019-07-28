@@ -1,5 +1,8 @@
 # csc461-project
 Programming Languges Semester Project
+This repo contains both a client and a server.
+The server receives commands from the client and 
+returns a result. 
 
 Environment:
   Perl 5
